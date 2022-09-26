@@ -2,7 +2,12 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+try:
+    from setuptools import setup
+except:
+    from distutils.core import setup
+    
+from setuptools import find_packages
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -34,7 +39,8 @@ setup(
             'pyviscous=pyviscous.cli:main',
         ],
     },
-    install_requires=requirements,
+    install_requires=['xarray', 'numpy', 'pandas', 'scipy',
+                      'matplotlib', 'sklearn','jupyter'],
     license="GNU General Public License v3",
     long_description=readme + '\n\n' + history,
     include_package_data=True,
@@ -47,3 +53,5 @@ setup(
     version='0.1.0',
     zip_safe=False,
 )
+
+
