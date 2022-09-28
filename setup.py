@@ -9,8 +9,7 @@ except:
     
 from setuptools import find_packages
 
-requirements = ['xarray', 'numpy', 'pandas', 'scipy',
-                'matplotlib', 'sklearn','jupyter']
+requirements = ['numpy', 'pandas', 'scipy', 'sklearn', 'matplotlib', 'jupyter']
 
 test_requirements = [ ]
 
