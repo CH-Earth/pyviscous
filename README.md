@@ -1,10 +1,17 @@
-## pyVISCOUS
+### Abstract
 pyVISCOUS is the open-source code of VISCOUS in Python. VISCOUS is a computationally frugal variance-based global sensitivity analysis framework ([Sheikholeslami et al., 2021](https://doi.org/10.1029/2020WR028435)). VISCOUS consists of two elements: developing a probability model to describe the relationship between model inputs (e.g., model parameters) and outputs (e.g., model responses); and computing the Sobol sensitivity indices based on the developed probability model.
 
 ### Installation
+#### From PyPI
 ```pip install pyviscous```
 
-### Usage
+#### From source
+
+Clone pyviscous with: ```git clone https://github.com/h294liu/pyviscous.git```
+
+Then navigate to the pyviscous directory and install with: ```python setup.py install```
+
+### Examples
 We provide four example notebooks in the example directory. In each example, there are scripts to generate input-output data, set up and run VISCOUS, and evaluate the sensitivity results.
 
 ### References
