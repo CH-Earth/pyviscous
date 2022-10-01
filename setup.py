@@ -6,12 +6,17 @@ try:
     from setuptools import setup
 except:
     from distutils.core import setup
-    
+
 from setuptools import find_packages
 
 requirements = ['numpy', 'pandas', 'scipy', 'sklearn', 'matplotlib', 'jupyter']
 
 test_requirements = [ ]
+
+# read the contents of your README file for distribution on PyPI
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
 setup(
     author="Hongli Liu",
@@ -44,6 +49,8 @@ setup(
     url='https://github.com/h294liu/pyviscous',
     version='1.1.0',
     zip_safe=False,
+    long_description=long_description,
+    long_description_content_type='text/markdown',
 )
 
 
