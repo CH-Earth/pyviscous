@@ -17,7 +17,7 @@ We provide four example notebooks in the example directory. In each example, the
 ### References
 Sheikholeslami, R., Gharari, S., Papalexiou, S. M., & Clark, M. P. (2021) VISCOUS: A variance-based sensitivity analysis using copulas for efficient identification of dominant hydrological processes. Water Resources Research, 57, e2020WR028435, https://doi.org/10.1029/2020WR028435
 
-Liu, H., Clark, M. P., Gharari, S., Sheikholeslami, R., Freer, J., & Papalexiou, S. M. (2022) pyVISCOUS: An open-source tool for computationally frugal global sensitivity analysis. (Submitted to Water Resources Research)
+Liu, H., Clark, M. P., Gharari, S., Sheikholeslami, R., Freer, J., Knoben, W. J. M., & Papalexiou, S. M. (2022) pyVISCOUS: An open-source tool for computationally frugal global sensitivity analysis. (Submitted to Water Resources Research)
 
 ---
 This package was created with Cookiecutter and the `https://github.com/audreyr/cookiecutter-pypackage` project template.
