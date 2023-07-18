@@ -9,7 +9,7 @@ except:
 
 from setuptools import find_packages
 
-requirements = ['numpy', 'pandas', 'scipy', 'sklearn', 'copulae', 'matplotlib', 'jupyter']
+requirements = ['numpy', 'pandas', 'scipy', 'scikit-learn', 'copulae', 'matplotlib', 'jupyter']
 
 test_requirements = [ ]
 
