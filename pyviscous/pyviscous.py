@@ -1,6 +1,3 @@
-# pyviscous.py is the open-source code of the VISCOUS framework. 
-# pyviscous.py is independent from the evaluated model and can be applied with user-provided input-output data (e.g., model parameters and model responses).
-
 import numpy as np
 import pandas as pd
 from   scipy.stats import multivariate_normal, norm, gaussian_kde
@@ -19,10 +16,10 @@ def viscous(x, y, xIndex, sensType, N1=2000, N2=2000, n_components='optimal'):
     
     Parameters
     -------
-    x            : array, shape (n_samples, n_xvariables). X values in observation space. 
-    y            : array, shape (n_samples, 1). Y values in observation space. 
-    xIndex       : list. List of indices of x variable to be evaluated. eg, [0], [0,1]. 
-                   e.g., [0] computes x1's sensitivity. [0,1] computes x1 and x2's sensitivity one after another.
+    x            : array, shape (n_samples, n_xvariables). x values in input space. 
+    y            : array, shape (n_samples, 1). y values in output space. 
+    xIndex       : int. The evaluated input variable index, starting from zero. 
+                   e.g., Index 0 refers to the 1st input variable x1, meaning we aim to calculate the sensitivity index of x1.  
     sensType     : str. Type of Sensitivity index calculation. Two options: 'first', 'total'.
     N1           : int. Number of Monte Carlo samples used for the outer loop. Default N1=2000.
     N2           : int. Number of Monte Carlo samplesused for the inner loop. Default N2=2000. 
@@ -33,17 +30,24 @@ def viscous(x, y, xIndex, sensType, N1=2000, N2=2000, n_components='optimal'):
     Returns
     -------
     sens_indx    : scalar. Sobol' sensitivity index estimate.
-    #gmcm        : Best fitted GMCM."""
+    gmcm         : GMCM object. Best fitted GMCM. """
     
+    # ################# Check arguments ################# 
     # Check if x or y is empty or full of the same value.
     if len(np.unique(x))<=1 or len(np.unique(x))<=1 or len(np.unique(y))<=1 or len(np.unique(y))<=1:
         print('Error: x or(and) y is empty or full of the same value.')
         return None
-        
+    
+    # Check xIndex meets the requirement
+    if not isinstance(xIndex, int):
+        print('Error: Unrecognized xIndex. xIndex needs to be an integer.')
+        return None
+    
+    # Check sensType meets the requirement
     if sensType in ['first', 'total']:
         print('Calculating %s-order sensitivity index for variable index %s...'%(sensType, xIndex))
     else:
-        print('Error: Unrecognized sensType or xIndex.')
+        print('Error: Unrecognized sensType. sensType needs to be either "single" or "total"')
         return None
 
     # ################# PART A: Data preparation #################
@@ -64,8 +68,8 @@ def viscous(x, y, xIndex, sensType, N1=2000, N2=2000, n_components='optimal'):
     # Note: Part B (GMCM inference) and Part C (Sensitivity index computation) are all based on normalized data.
     x_sens_norm = x_sens.copy()
     for ii in range(np.shape(x_sens)[1]):
-        x_sens_norm[:,ii] = data_normalization(x_sens[:,ii])
-    y_norm = data_normalization(y) 
+        x_sens_norm[:,ii] = data_normalize(x_sens[:,ii])
+    y_norm = data_normalize(y) 
 
     # Estimate y_norm variance. 
     varY = np.var(y_norm)
@@ -112,15 +116,16 @@ def viscous(x, y, xIndex, sensType, N1=2000, N2=2000, n_components='optimal'):
     
     # If there is no way to get a valid sensitivity result, output -999.
     # Possible reasons: insufficient samples, GMCM non-convergency.
-    if (np.isnan(sens_indx)) or not ('sens_indx' in locals()):       
+    if not ('sens_indx' in locals()) or (np.isnan(sens_indx)):       
         print('    Warning: sens_indx = -999. Sensitivity calculation fails. Please check input-output data.')
         sens_indx = -999.0
+        gmcm      = -999.0
         
     print('    Sensitivity index = %.6f'%(sens_indx))
     
-    return sens_indx
+    return sens_indx, gmcm
 
-def data_normalization(data):
+def data_normalize(data):
     """ 
     Normalize data using Min-Max Scalar.
     Normalization changes the data values to a common scale, without distorting differences in the ranges of values.
@@ -196,11 +201,21 @@ def gmcm_inference(x_norm, y_norm, n_components='optimal'):
             if trial_id==1:
                 try:
                     fit_summary = k_means(data, n_clusters, n_dim, ties='average',init='k-means++')
-                except:
-                    fit_summary = k_means(data, n_clusters, n_dim,  ties='average',init='random')
+                except ValueError:
+                    pass
             else:
-                fit_summary = k_means(data, n_clusters, n_dim,  ties='average',init='random')
-            param_init = fit_summary.best_params
+                try:
+                    fit_summary = k_means(data, n_clusters, n_dim,  ties='average',init='random')
+                except ValueError:
+                    pass
+            
+            # If fit_summary is obtained, pass it to param_init. Otherwise, move to the next trial.
+            try:
+                param_init = fit_summary.best_params
+            except:
+                print('\tinitial %d: fitting fails due to k_means initialization ValueError.'%(trial_id))
+                trial_id = trial_id+1                
+                continue
 
             # Fit gmcm params 
             try:
@@ -219,10 +234,9 @@ def gmcm_inference(x_norm, y_norm, n_components='optimal'):
                     trial_id = trial_id+1                                        
                     continue
             except:
-                print('\tinitial %d: fitting fails due to np.linalg.LinAlgError.'%(trial_id))
+                print('\tinitial %d: fitting fails due to singular matrix error.'%(trial_id))
                 trial_id = trial_id+1                
-                continue
-                
+                continue                
 
         # ---------------------------------
         # Compute the AIC score for the fitted gmcm.  

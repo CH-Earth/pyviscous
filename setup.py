@@ -9,7 +9,7 @@ except:
 
 from setuptools import find_packages
 
-requirements = ['numpy', 'pandas', 'scipy', 'sklearn', 'matplotlib', 'jupyter']
+requirements = ['numpy', 'pandas', 'scipy', 'sklearn', 'copulae', 'matplotlib', 'jupyter']
 
 test_requirements = [ ]
 
@@ -32,7 +32,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="Python codes to implement the VISCOUS global sensitivity analysis framework",
+    description="Python codes to implement the VISCOUSm global sensitivity analysis framework",
     entry_points={
         'console_scripts': [
             'pyviscous=pyviscous.cli:main',
@@ -43,11 +43,11 @@ setup(
     include_package_data=True,
     keywords='pyviscous',
     name='pyviscous',
-    packages=find_packages(include=['pyviscous', 'pyviscous.*']),
+    packages=find_packages(include=['pyviscous', 'pyviscous.*', 'plot.*']),
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/h294liu/pyviscous',
-    version='1.1.0',
+    url='https://github.com/CH-Earth/pyviscous',
+    version='1.2.0',
     zip_safe=False,
     long_description=long_description,
     long_description_content_type='text/markdown',
