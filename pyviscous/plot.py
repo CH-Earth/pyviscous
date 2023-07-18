@@ -1,16 +1,25 @@
 import numpy as np
 import pandas as pd
 from   scipy.stats       import multivariate_normal
-import matplotlib        as mpl
+import matplotlib        as     mpl
 import matplotlib.pyplot as     plt
 import matplotlib.colors as     colors  
 from   matplotlib        import gridspec
+from   copulae.core      import pseudo_obs
 
 import sys
 sys.path.append('./')
-import pyviscous         as vs
+import pyviscous as vs
+
 
 def plot_rosenbrock_3d(ofile):
+    """ 
+    Plot the example Rosenbrock function in 3D.    
+    
+    Parameters
+    -------
+    ofile: str or path-like. Output file path. """
+    
     # Generate gridded sample data
     N = 1000  # number of meshgrid points
     x1 = np.linspace(-2, 2, N)
@@ -21,7 +30,7 @@ def plot_rosenbrock_3d(ofile):
     Y = 100 * (X2 - X1**2)**2 + (1 - X1)**2  
 
     # Plot data in 3D mode 
-    fig = plt.figure(figsize=(5,4.5))
+    fig = plt.figure(figsize=(6,6))
     ax = fig.add_subplot(1, 1, 1, projection='3d')
 
     surf = ax.plot_surface(X1, X2, Y, cmap='viridis', edgecolor='none',alpha=0.7) # plot 3D surface.
@@ -47,13 +56,38 @@ def plot_rosenbrock_3d(ofile):
 
     # # Save figure
     plt.show()
-    fig.savefig(ofile)
+    fig.savefig(ofile, dpi=150)
     plt.close(fig)  
     return 
 
-def plot_data_conversion(x,y,x_norm,y_norm,ux,uy,xIndex,ofile):
+def plot_data_conversion(x,y,xIndex,ofile):
+    """ 
+    Plot data conversion in VISCOUSm: input-output data, normalized data, empirical CDF data.    
     
-    ### PLOT ###
+    Parameters
+    -------
+    x       : array, shape (n_samples, n_xvariables). x values in input space. 
+    y       : array, shape (n_samples, 1). y values in output space. 
+    xIndex  : int. The evaluated input variable index, starting from zero.     
+    ofile   : str or path-like. Output file path. """
+    
+    # --- DATA CONVERSION ---
+    # Normalize input-output data
+    x_norm = x.copy()
+    for ii in range(np.shape(x_norm)[1]):
+        x_norm[:,ii] = vs.data_normalize(x[:,ii])
+    y_norm = vs.data_normalize(y)
+
+    # Calculate rank-based empirical marginal CDF
+    ux = x.copy()
+    for ii in range(np.shape(ux)[1]):
+        ux[:,ii] = pseudo_obs(x[:,ii], ties='average')
+    uy = pseudo_obs(y, ties='average')
+
+    # Extract CDF for evaluated input-output data
+    u = np.concatenate((ux[:,xIndex].reshape((-1,1)),uy),axis=1)
+
+    # --- PLOT ---
     # set figure columns and rows
     ndata   = 3        # three sets of data
     ncols   = ndata*2  # number of columns 
@@ -69,15 +103,15 @@ def plot_data_conversion(x,y,x_norm,y_norm,ux,uy,xIndex,ofile):
     for i in range(ndata):
         if i == 0:
             data_x,data_y = x[:,xIndex],y
-            xlabel,ylabel = '${X_1}$','$Y$'
-            title = '(a) Input-output data $(x_1, y)$'  
+            xlabel,ylabel = '${X_%d}$'%(xIndex+1),'$Y$'
+            title = '(a) Input-output data $(x_%d, y)$'%(xIndex+1) 
         elif i == 1:
             data_x,data_y = x_norm[:,xIndex],y_norm
-            xlabel,ylabel = "${X'_1}$","$Y'$"  
-            title = "(b) Normalized data $(x'_1, y')$"  
+            xlabel,ylabel = "${X'_%d}$"%(xIndex),"$Y'$"  
+            title = "(b) Normalized data $(x'_%d, y')$"%(xIndex+1)  
         elif i == 2:
             data_x,data_y = ux[:,xIndex],uy
-            xlabel,ylabel = '${U_{X_1}}$','${U_{Y}}$'
+            xlabel,ylabel = '${U_{X_%d}}$'%(xIndex+1),'${U_{Y}}$'
             title = '(c) Marginal CDF data $(u_{x_1}, u_y)$'
 
         # Create the Axes.  
@@ -104,63 +138,80 @@ def plot_data_conversion(x,y,x_norm,y_norm,ux,uy,xIndex,ofile):
             ax.set_ylabel(ylabel, fontsize='small', fontweight='bold',labelpad=-1) 
         ax.tick_params(axis='both', labelsize='small')
 
-    # plt.savefig(os.path.join(outputDir,'data.png'), dpi=150)
-    # plt.savefig(os.path.join(outputDir,'data.pdf'))
+    plt.savefig(ofile, dpi=150)
     plt.show()
+    plt.close(fig)  
     return
 
-def plot_gmm_pdf_cluster(gmm, data, ofile):
-    
-    '''Plot the GMM (Gaussian mixture model) inverse CDF, PDFs and clusters for given data.
+def plot_gmm_pdf_cluster(gmm, x, y, xIndex, ofile):
+    '''
+    Plot the GMM (Gaussian mixture model) inverse CDF, PDFs and clusters for given data.
     
     Parameters
     -------
-    gmm:     input object. The best fitted Gaussian mixture model (GMM) used by a specific variable group.
-    data:    input array. Inverse CDF data (nSample,n_variables).
-    ofile:   output figure file path. 
+    gmm     : object. The best fitted Gaussian mixture model (GMM).
+    x       : array, shape (n_samples, n_xvariables). x values in input space. 
+    y       : array, shape (n_samples, 1). y values in output space. 
+    xIndex  : int. The evaluated input variable index, starting from zero.     
+    ofile   : str or path-like. Output file path. 
     
     Note
     -------
     This function is valid for the first-order sensitivity estimate. 
     Please adjust for the total-order sensitivity because more dimensions need included in the plot. '''
     
+    # --- PREPARE ---
     # Get the GMM information based on the GMCM parameters    
-    gmmWeights         = gmm.params.prob          # shape (n_components,)
-    gmmMeans           = gmm.params.means         # shape (n_components, n_variables). n_variables = n_feature in sklearn.mixture.GaussianMixture reference.
-    gmmCovariances     = gmm.params.covs          # (n_components, n_variables, n_variables) if covariance_type = ‘full’ (by default).    
-    gmmNComponents     = gmm.params.n_clusters    # number of components
+    gmmWeights         = gmm.params.prob        # shape (n_components,)
+    gmmMeans           = gmm.params.means       # shape (n_components, n_variables). 
+                                                # n_variables = n_feature in sklearn.mixture.GaussianMixture reference.
+    gmmCovariances     = gmm.params.covs        # (n_components, n_variables, n_variables)    
+    gmmNComponents     = gmm.params.n_clusters  # number of components
 
-    pdf_all_cpnts = np.zeros((len(data),gmmNComponents))
+    # Calculate rank-based empirical marginal CDF
+    ux = x.copy()
+    for ii in range(np.shape(ux)[1]):
+        ux[:,ii] = pseudo_obs(x[:,ii], ties='average')
+    uy = pseudo_obs(y, ties='average')
+
+    # Extract CDF for evaluated input-output data
+    u = np.concatenate((ux[:,xIndex].reshape((-1,1)),uy),axis=1)
+    
+    # Calculate the inverse CDF of u in GMM, z, given GMM
+    z = vs.gmm_marginal_ppf(u, gmm.params)
+    
+    # Calculate the joint pdf value of z in GMM
+    pdf = gmm.pdf(z) 
+
+    # Get cluster(label) of each data point of u
+    pdf_all_cpnts = np.zeros((len(ux),gmmNComponents))
     for n_component in range(gmmNComponents):
         mean, cov = gmmMeans[n_component,:],gmmCovariances[n_component,:,:]
-        pdf_all_cpnts[:,n_component] = multivariate_normal.pdf(data, mean, cov)
+        pdf_all_cpnts[:,n_component] = multivariate_normal.pdf(z, mean, cov)
     labels = np.argmax(pdf_all_cpnts, axis=1)
     
-    # Calculate the joint pdf value of data
-    pdf = gmm.pdf(data)
-
     # Construct a dataframe with four pieces of information
     frame            = pd.DataFrame()
-    frame['zx']      = data[:,0]
-    frame['zy']      = data[:,-1]
-    frame['cluster'] = labels+1 # cluster starts from one, not zero.
-    frame['pdf']     = pdf #pdf_gmcm 
+    frame['zx']      = z[:,0]
+    frame['zy']      = z[:,-1]
+    frame['pdf']     = pdf 
+    frame['cluster'] = labels+1  # cluster starts from one.
 
-    # Plot 
+    # --- PLOT ---
     ncols   = 3
     nrows   = 1
     fig, ax = plt.subplots(nrows=nrows, ncols=ncols,figsize=(4*ncols,3*nrows))
 
     for icol in range(ncols):
         if icol == 0:
-            title = '(a) ($z_{x_1}$, $z_y$) data in GMM'
+            title = '(a) ($z_{x_%d}$, $z_y$) data in GMM'%(xIndex+1)
             counts, xedges, yedges, im = ax[icol].hist2d(frame["zx"], frame["zy"],cmin=1,
                                                     bins=100,cmap='viridis',density=False)
             cbar = fig.colorbar(im, ax=ax[icol])
             cbar.ax.set_title('Count',fontsize='medium',style='italic')    
 
         elif icol == 1:
-            title = '(b) ($z_{x_1}$, $z_y$) PDF in GMM' 
+            title = '(b) ($z_{x_%d}$, $z_y$) PDF in GMM'%(xIndex+1) 
             scatter = ax[icol].scatter(frame["zx"], frame["zy"], c=frame["pdf"], 
                                        s=1,cmap="viridis",alpha=0.8)
 
@@ -168,7 +219,7 @@ def plot_gmm_pdf_cluster(gmm, data, ofile):
             cbar.ax.set_title('PDF',fontsize='medium',style='italic')
 
         if icol == 2:
-            title = '(c) ($z_{x_1}$, $z_y$) cluster in GMM' 
+            title = '(c) ($z_{x_%d}$, $z_y$) cluster in GMM'%(xIndex+1)
             scatter = ax[icol].scatter(frame["zx"], frame["zy"], c=frame["cluster"], s=1,cmap="jet",alpha=0.8)
             
             if gmmNComponents<=4:
@@ -182,7 +233,7 @@ def plot_gmm_pdf_cluster(gmm, data, ofile):
                 cbar.ax.set_title('Cluster',fontsize='medium',style='italic')    
 
         ax[icol].set_title(title)#,fontsize='small')
-        ax[icol].set_xlabel('$Z_{X_1}$',labelpad=0)
+        ax[icol].set_xlabel('$Z_{X_%d}$'%(xIndex+1),labelpad=0)
         ax[icol].set_ylabel('$Z_Y$',labelpad=0)
 
     # Apply the same xlim and ylim for all subplots.
@@ -191,21 +242,42 @@ def plot_gmm_pdf_cluster(gmm, data, ofile):
 
     plt.tight_layout()
     plt.savefig(ofile, dpi=150)
-    plt.show()
-    
+    plt.show()    
+    plt.close(fig)  
     return
 
 
-def plot_gmm_counter(gmm, z, xIndex, ofile):
-    ###############################################################################
-    #  Compute GMM PDF and each component PDF at mesh grid points
+def plot_gmm_counter(gmm, x, y, xIndex, ofile):
+    '''
+    Plot the GMM components in the format of countour.
+    
+    Parameters
+    -------
+    gmm     : object. The best fitted Gaussian mixture model (GMM).
+    x       : array, shape (n_samples, n_xvariables). x values in input space. 
+    y       : array, shape (n_samples, 1). y values in output space. 
+    xIndex  : int. The evaluated input variable index, starting from zero.     
+    ofile   : str or path-like. Output file path. 
+    
+    Note
+    -------
+    This function is valid for the first-order sensitivity estimate. 
+    Please adjust for the total-order sensitivity because more dimensions need included in the plot. '''
+    
+    # --- GET INVERSE CDF, Z ---
+    # Calculate rank-based empirical marginal CDF
+    ux = x.copy()
+    for ii in range(np.shape(ux)[1]):
+        ux[:,ii] = pseudo_obs(x[:,ii], ties='average')
+    uy = pseudo_obs(y, ties='average')
 
-    # Get GMM weights, means, and covariances.
-    gmmWeights         = gmm.params.prob          # shape (n_components,)
-    gmmMeans           = gmm.params.means         # shape (n_components, n_variables). n_variables = n_feature in sklearn.mixture.GaussianMixture reference.
-    gmmCovariances     = gmm.params.covs          # (n_components, n_variables, n_variables) if covariance_type = ‘full’ (by default).    
-    gmmNComponents     = gmm.params.n_clusters    # number of components
+    # Extract CDF for evaluated input-output data
+    u = np.concatenate((ux[:,xIndex].reshape((-1,1)),uy),axis=1)
+    
+    # Calculate the inverse CDF of u in GMM, z, given GMM
+    z = vs.gmm_marginal_ppf(u, gmm.params)
 
+    # --- GET MESHGRIDS BASED ON Z --- 
     # (1) Create mesh grid on (zx1,zy) dimensions for contour plot
     N                  = 1000   # meshgrid points used in uniform sampling to create mesh grid
     zx_2cpnt,zy_2cpnt  = z[:,xIndex], z[:,-1]
@@ -219,7 +291,14 @@ def plot_gmm_counter(gmm, z, xIndex, ofile):
 
     X, Y = np.meshgrid(zx_uniform_samples, zy_uniform_samples)  # create mesh over N-N grids
 
-    # (2) Loop to calculate GMM PDF and invidivual component PDF per mesh grid point
+    # (2) Get the GMM information based on the GMCM parameters    
+    gmmWeights         = gmm.params.prob        # shape (n_components,)
+    gmmMeans           = gmm.params.means       # shape (n_components, n_variables). 
+                                                # n_variables = n_feature in sklearn.mixture.GaussianMixture reference.
+    gmmCovariances     = gmm.params.covs        # (n_components, n_variables, n_variables)    
+    gmmNComponents     = gmm.params.n_clusters  # number of components
+
+   # (3) Loop to calculate GMM PDF and invidivual component PDF per mesh grid point
     jointPDF = np.zeros((N,N))                    # GMM PDF, dimension is (x,y).
     jointPDFCpnt = np.zeros((N,N,gmmNComponents)) # Individual component PDF, dimension is (x,y,component).
 
@@ -238,8 +317,7 @@ def plot_gmm_counter(gmm, z, xIndex, ofile):
             jointPDFCpnt[:,i,iComponent] = multivariate_normal.pdf(multivariateData, 
                                                                    mean=gmmMeans[iComponent,:],
                                                                    cov=gmmCovariances[iComponent,:,:]) 
-
-    ###############################################################################
+    # --- PLOT ---
     # Plot GMM PDF and invidivual componnet PDF in contours
     fs        = 'medium'  # plot font size
     ncols     = 3         # three subplots per row
@@ -265,7 +343,7 @@ def plot_gmm_counter(gmm, z, xIndex, ofile):
                 cbar = plt.colorbar(im, ax=axes[icol], **kwargs)
                 cbar.ax.set_title('PDF',fontsize=fs, style='italic')    
 
-                axes[icol].set_xlabel(r"$Z_{x_1}$")
+                axes[icol].set_xlabel(r"$Z_{x_%d}$"%(xIndex+1))
                 axes[icol].set_ylabel(r"$Z_y$")
             else:
                 axes[icol].axis('off')
@@ -296,23 +374,47 @@ def plot_gmm_counter(gmm, z, xIndex, ofile):
                     axes[irow,icol].axis('off')
 
     plt.tight_layout()
-    # plt.savefig(os.path.join(outputDir,'gmm_2cpnt_contour.png'), dpi=150)
+    plt.savefig(ofile, dpi=150)
     plt.show() 
+    plt.close(fig)  
     return
 
-def plot_gmm_marginal_dists(u, gmm, xIndex, ofile):
+def plot_gmm_marginal_dists(gmm, x, y, xIndex, ofile):
     '''
-    u: CDF data
-    gmm: fitted GMM
-    ofile: output file'''
+    Plot the GMM components in the format of countour.
     
-    # Approximates the inverse cdf of the input given the GMM parameters
-    z = vs.gmm_marginal_ppf(u, gmm.params)  
+    Parameters
+    -------
+    gmm     : object. The best fitted Gaussian mixture model (GMM).
+    x       : array, shape (n_samples, n_xvariables). x values in input space. 
+    y       : array, shape (n_samples, 1). y values in output space. 
+    xIndex  : int. The evaluated input variable index, starting from zero.     
+    ofile   : str or path-like. Output file path. 
+    
+    Note
+    -------
+    This function is valid for the first-order sensitivity estimate. 
+    Please adjust for the total-order sensitivity because more dimensions need included in the plot. '''
+    
+    # --- GET INVERSE CDF, Z ---
+    # Calculate rank-based empirical marginal CDF
+    ux = x.copy()
+    for ii in range(np.shape(ux)[1]):
+        ux[:,ii] = pseudo_obs(x[:,ii], ties='average')
+    uy = pseudo_obs(y, ties='average')
 
-    # Get GMM weights, means, and covariances.
+    # Extract CDF for evaluated input-output data
+    u = np.concatenate((ux[:,xIndex].reshape((-1,1)),uy),axis=1)
+    
+    # Calculate the inverse CDF of u in GMM, z, given GMM
+    z = vs.gmm_marginal_ppf(u, gmm.params)    # Approximates the inverse cdf of the input given the GMM parameters
+  
+    # --- GET Z CLUSTER ---
+    # Get the GMM information based on the GMCM parameters    
     gmmWeights         = gmm.params.prob        # shape (n_components,)
-    gmmMeans           = gmm.params.means       # shape (n_components, n_variables). n_variables = n_feature in sklearn.mixture.GaussianMixture reference.
-    gmmCovariances     = gmm.params.covs        # (n_components, n_variables, n_variables) if covariance_type = ‘full’ (by default).    
+    gmmMeans           = gmm.params.means       # shape (n_components, n_variables). 
+                                                # n_variables = n_feature in sklearn.mixture.GaussianMixture reference.
+    gmmCovariances     = gmm.params.covs        # (n_components, n_variables, n_variables)    
     gmmNComponents     = gmm.params.n_clusters  # number of components
 
     # Get each z data point's GMM clustering (label). 
@@ -324,7 +426,7 @@ def plot_gmm_marginal_dists(u, gmm, xIndex, ofile):
     labels = np.argmax(pdf_all_cpnts, axis=1)
     # print(np.unique(labels, return_counts=True))
     
-    # Plot 
+    # --- PLOT --- 
     ncols   = 2
     nrows   = 1
     fig, ax = plt.subplots(nrows=nrows, ncols=ncols)#,figsize=(4*ncols,3gmmNComponents*nrows))
@@ -364,6 +466,7 @@ def plot_gmm_marginal_dists(u, gmm, xIndex, ofile):
     plt.tight_layout()
     plt.savefig(ofile, dpi=150)
     plt.show()
+    plt.close(fig)  
     return
 
 def plot_gmm_mean_cov(gmm, sensType, xIndex, ofile):
@@ -372,11 +475,12 @@ def plot_gmm_mean_cov(gmm, sensType, xIndex, ofile):
     
     Parameters
     -------
-    gmm:         input, object. The Gaussian mixture model (GMM).
-    sensType:    input, str. Type of Sensitivity index calculation. Two options: 'first', 'total'.
-    xIndex:      input, int. The evaluated input variable index, starting from zero.   
-    ofile:       output, figure file path. '''
+    gmm      : object. The best fitted Gaussian mixture model (GMM).
+    sensType : input, str. Type of Sensitivity index calculation. Two options: 'first', 'total'.
+    xIndex   : input, int. The evaluated input variable index, starting from zero.   
+    ofile    : str or path-like. Output file path. '''
 
+    # --- GET GMM PARAMETERS ---
     # Get the GMM information based on the GMCM parameters    
     gmmWeights         = gmm.params.prob          # shape (n_components,)
     gmmMeans           = gmm.params.means         # shape (n_components, n_variables). n_variables = n_feature in sklearn.mixture.GaussianMixture reference.
@@ -396,10 +500,11 @@ def plot_gmm_mean_cov(gmm, sensType, xIndex, ofile):
         xticklabels.pop(xIndex)           # Drop xIndex corresponding variable
         xticklabels.append(r'${Z_{y}}$')  # Append Zy tick
 
-    # Plot
-    fs      ='small'                                                                # text fontsize
-    markers = ['o', 'v', 's', '*', '^', 'D', 'p', '>', 'h', 'H', '<', 'd', 'P', 'X'] # a list of markers for Gaussian mean plot
-    axes    = []                                                                     # collect a list of axes to insert the colorbar
+    # --- PLOT ---
+    fs      ='small'  # text fontsize
+    # a list of markers for Gaussian mean plot
+    markers = ['o', 'v', 's', '*', '^', 'D', 'p', '>', 'h', 'H', '<', 'd', 'P', 'X']   
+    axes    = []      # collect a list of axes to insert the colorbar
 
     # Create a figure
     ncol = 3
@@ -453,4 +558,5 @@ def plot_gmm_mean_cov(gmm, sensType, xIndex, ofile):
 
     plt.savefig(ofile,dpi=150)
     plt.show()    
+    plt.close(fig)  
     return
