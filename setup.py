@@ -47,7 +47,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/CH-Earth/pyviscous',
-    version='1.2.0',
+    version='1.2.1',
     zip_safe=False,
     long_description=long_description,
     long_description_content_type='text/markdown',
