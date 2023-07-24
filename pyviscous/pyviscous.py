@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from   scipy.stats import multivariate_normal, norm, gaussian_kde
+from   scipy.stats import multivariate_normal
 from   sklearn.cluster import KMeans
 from   scipy.interpolate import interp1d     # used to estimate the empirical relationship between y_norm and y_cdf
 
