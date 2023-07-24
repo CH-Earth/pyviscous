@@ -1,9 +1,9 @@
 ### Abstract
-pyVISCOUS is the open-source code of VISCOUS (VarIance-based Sensitivity analysis using COpUlaS) in Python. VISCOUS is a copula-based framework for efficient global sensitivity analysis. It was developed by Sheikholeslami et al. ([2021](https://doi.org/10.1029/2020WR028435)) and improved by Liu et al. (2023). The advantage of VISCOUS is that it can estimate Sobol’ first-order and total-order sensitivity indices by using existing input-output data (e.g., model parameters-responses data) without requiring additional model runs. 
+pyVISCOUS is the open-source code of VISCOUS in Python. VISCOUS (VarIance-based Sensitivity analysis using COpUlaS) is a variance-based global sensitivity analysis framework. It was developed by Sheikholeslami et al. ([2021](https://doi.org/10.1029/2020WR028435)) and improved by Liu et al. (2023).The advantage of VISCOUS is that it can use existing model input-output data (e.g., water model parameters-responses) to estimate the first- and total-order Sobol’ sensitivity indices. 
 
-In other words, VISCOUS is a given-data approach (also known as data-driven approach). It can be implemented regardless of whether the underlying relationship or mechanism between input and output data is known. It also enables the application of gloabl sensitivity analysis to computationally intensive models by generating reliable sensitivity estimates with minimal computational resources. 
+VISCOUS is a given-data approach. It can be implemented regardless of whether the underlying relationship or mechanism between input and output data is known. It also enables the application of gloabl sensitivity analysis to computationally intensive models by generating reliable sensitivity estimates with minimal computational resources. 
 
-Within the VISCOUS framework, the following steps are included.
+Within the VISCOUS framework, the following steps are included. Details can be found in Liu et al. (2023).
 
 ![flowchart](https://github.com/CH-Earth/pyviscous/assets/48458815/2e8f7575-41d4-4e6a-bac8-fadc2a5b9c7a)
 
