@@ -2,10 +2,11 @@
 pyVISCOUS is the open-source code of VISCOUS in Python. VISCOUS (VarIance-based Sensitivity analysis using COpUlaS) is a variance-based global sensitivity analysis framework. It was developed by Sheikholeslami et al. ([2021](https://doi.org/10.1029/2020WR028435)) and improved by Liu et al. (2023).
 
 
-As a “given-data” method, VISCOUS uses existing model input and output data (e.g., model parameters and responses) to provide useful approximations of the first- and total- order Sobol’ sensitivity indices. The greatest advantage of VISCOUS over other given-data global sensitivity analysis methods is that VISCOUS does not require the input data follow any specific sampling strategies. The input-output data can be from the previous model runs generated from other modeling purposes, such as uncertainty propagation and model calibration.
+As a “given-data” method, VISCOUS uses existing model input and output data (e.g., model parameters and responses) to provide useful approximations of the first- and total-order Sobol’ sensitivity indices. The greatest advantage of VISCOUS over other given-data global sensitivity analysis methods is that VISCOUS does not require the input data follow any specific sampling strategies. The input-output data can be from the previous model runs generated from other modeling purposes, such as uncertainty propagation and model calibration.
 
 
 Within the VISCOUS framework, the following steps are included. Details can be found in Liu et al. (2023).
+
 ![flowchart](https://github.com/CH-Earth/pyviscous/assets/48458815/2e8f7575-41d4-4e6a-bac8-fadc2a5b9c7a)
 
 ### Installation
