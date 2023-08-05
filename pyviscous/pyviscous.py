@@ -206,7 +206,7 @@ def gmcm_inference(x_norm, y_norm, n_components='optimal'):
             else:
                 try:
                     fit_summary = k_means(data, n_clusters, n_dim,  ties='average',init='random')
-                except ValueError:
+                except:
                     pass
             
             # If fit_summary is obtained, pass it to param_init. Otherwise, move to the next trial.

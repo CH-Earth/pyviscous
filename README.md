@@ -19,6 +19,15 @@ Clone pyviscous with: ```git clone https://github.com/CH-Earth/pyviscous.git```
 
 Then navigate to the pyviscous directory and install with: ```python setup.py install```
 
+### Do not want to install pyviscous
+If you do not want to install pyviscous, you can use pyviscous by adding the pyviscous source code to the system path. For example, you can use the following to import pyviscous in Python:
+
+```import sys
+sys.path.insert(<path_to_directory>)
+import pyviscous```
+
+<path_to_directory> is the path to the folder where the github repository is located on your computer. The first two lines add the path of the pyviscous source code directory to the system path so that Python can also look for the package in that directory if it doesn’t find it in its current directory. 
+
 ### Examples
 We provide four example notebooks in the example directory. In each example, there are scripts to generate input-output data, set up and run VISCOUS, and evaluate the sensitivity results.
 

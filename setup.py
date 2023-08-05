@@ -10,6 +10,9 @@ except:
 from setuptools import find_packages
 
 requirements = ['numpy', 'pandas', 'scipy', 'scikit-learn', 'copulae', 'matplotlib', 'jupyter']
+# Important note: if users decide to install the above required packages by themselves, please install copulae using pip, don't use conda. 
+# This is because the conda distribution of copulae hasn't incldued its entire source codes/functions. 
+# We will contact the developer of copulae to fix this issue with their release on conda. 
 
 test_requirements = [ ]
 
@@ -47,7 +50,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/CH-Earth/pyviscous',
-    version='2.1.0',
+    version='2.1.1',
     zip_safe=False,
     long_description=long_description,
     long_description_content_type='text/markdown',
