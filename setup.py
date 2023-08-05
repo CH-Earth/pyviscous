@@ -10,9 +10,9 @@ except:
 from setuptools import find_packages
 
 requirements = ['numpy', 'pandas', 'scipy', 'scikit-learn', 'copulae', 'matplotlib', 'jupyter']
-# Important note: if users decide to install the above required packages by themselves, please install copulae using pip, don't use conda. 
-# This is because the conda distribution of copulae hasn't incldued its entire source codes/functions. 
-# We will contact the developer of copulae to fix this issue with their release on conda. 
+# Important note: if users install the above required packages by themselves, please install copulae via pip, not conda. 
+# This is because the conda distribution of copulae does not properly include its full source code/functions. 
+# We will remind the developer of copulae to fix this.
 
 test_requirements = [ ]
 
