@@ -38,9 +38,9 @@ We provide four example notebooks in the example directory. In each example, the
 Hongli Liu, Martyn P. Clark, Shervan Gharari, Razi Sheikholeslami, Jim Freer, Wouter J. M. Knoben, Christopher B. Marsh, & Simon Michael Papalexiou. (2023). pyVISCOUS. Zenodo. https://doi.org/10.5281/zenodo.8179325
 
 ### References
-Liu, H., Clark, M. P., Gharari, S., Sheikholeslami, R., Freer, J., Knoben, W. J. M., Marsh C. B., & Papalexiou, S. M. (2023) pyVISCOUS: An open-source tool for computationally frugal global sensitivity analysis. (Submitted to Water Resources Research)
+Liu, H., Clark, M. P., Gharari, S., Sheikholeslami, R., Freer, J., Knoben, W. J. M., Marsh C. B., & Papalexiou, S. M. (2023) An improved copula-based framework for efficient global sensitivity analysis. (Submitted to *Water Resources Research*)
 
-Sheikholeslami, R., Gharari, S., Papalexiou, S. M., & Clark, M. P. (2021) VISCOUS: A variance-based sensitivity analysis using copulas for efficient identification of dominant hydrological processes. Water Resources Research, 57, e2020WR028435, https://doi.org/10.1029/2020WR028435
+Sheikholeslami, R., Gharari, S., Papalexiou, S. M., & Clark, M. P. (2021) VISCOUS: A variance-based sensitivity analysis using copulas for efficient identification of dominant hydrological processes. *Water Resources Research*, 57, e2020WR028435, https://doi.org/10.1029/2020WR028435
 
 ---
 This package was created with Cookiecutter and the `https://github.com/audreyr/cookiecutter-pypackage` project template.
