@@ -9,7 +9,7 @@ from   copulae import GaussianMixtureCopula  # used to apply GMCM more flexibly
 from   copulae.core import pseudo_obs        # used to get data rank-based CDF
 from   copulae.mixtures.gmc import GMCParam  # used to generate initial GMCM parameter estiamtes
 from   copulae.mixtures.gmc.estimators.summary import FitSummary # used to get GMCM fitting results
-
+    
 def viscous(x, y, xIndex, sensType, N1=2000, N2=2000, n_components='optimal'):
     """ 
     Calculate the Sobol' first-order or total-order sensitivity indices based on the Gaussian Mixture Copula Model (GMCM).    
@@ -33,22 +33,31 @@ def viscous(x, y, xIndex, sensType, N1=2000, N2=2000, n_components='optimal'):
     gmcm         : GMCM object. Best fitted GMCM. """
     
     # ################# Check arguments ################# 
-    # Check if x or y is empty or full of the same value.
-    if len(np.unique(x))<=1 or len(np.unique(x))<=1 or len(np.unique(y))<=1 or len(np.unique(y))<=1:
-        print('Error: x or(and) y is empty or full of the same value.')
-        return None
+    # Check if x or y is empty or constant.
+    if x.size == 0 or len(np.unique(x))==1:
+        print('Error: x is empty or full of a constant value.')
+        return  -999.0, -999.0
+    if y.size==0 or len(np.unique(y))==1:
+        print('Error: y is empty or full of a constant value.')
+        return  -999.0, -999.0
+    
+    # Check if y is clustered in less than half of 20 bins.
+    hist, _ = np.histogram(y, bins=20)
+    if np.count_nonzero(hist)/hist.size < 0.5:
+        print('Error: y is under-dispersed (i.e., concentrated in a small number of bins).')
+        return  -999.0, -999.0
     
     # Check xIndex meets the requirement
     if not isinstance(xIndex, int):
         print('Error: Unrecognized xIndex. xIndex needs to be an integer.')
-        return None
+        return  -999.0, -999.0
     
     # Check sensType meets the requirement
     if sensType in ['first', 'total']:
         print('Calculating %s-order sensitivity index for variable index %s...'%(sensType, xIndex))
     else:
         print('Error: Unrecognized sensType. sensType needs to be either "single" or "total"')
-        return None
+        return  -999.0, -999.0
 
     # ################# PART A: Data preparation #################
     print('--- PART A: Data preparation')
@@ -118,8 +127,7 @@ def viscous(x, y, xIndex, sensType, N1=2000, N2=2000, n_components='optimal'):
     # Possible reasons: insufficient samples, GMCM non-convergency.
     if not ('sens_indx' in locals()) or (np.isnan(sens_indx)):       
         print('    Warning: sens_indx = -999. Sensitivity calculation fails. Please check input-output data.')
-        sens_indx = -999.0
-        gmcm      = -999.0
+        sens_indx, gmcm = -999.0, -999.0
         
     print('    Sensitivity index = %.6f'%(sens_indx))
     
