@@ -41,9 +41,9 @@ def viscous(x, y, xIndex, sensType, N1=2000, N2=2000, n_components='optimal'):
         print('Error: y is empty or full of a constant value.')
         return  -999.0, -999.0
     
-    # Check if y is clustered in less than half of 20 bins.
+    # Check if y is under-dispersed.
     hist, _ = np.histogram(y, bins=20)
-    if np.count_nonzero(hist)/hist.size < 0.5:
+    if np.count_nonzero(hist)/hist.size < 0.5: # y is clustered in less than half of 20 bins.
         print('Error: y is under-dispersed (i.e., concentrated in a small number of bins).')
         return  -999.0, -999.0
     
