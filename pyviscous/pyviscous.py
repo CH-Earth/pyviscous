@@ -128,7 +128,11 @@ def viscous(x, y, xIndex, sensType, N1=2000, N2=2000, n_components='optimal'):
     
     # If there is no way to get a valid sensitivity result, output -999.
     # Possible reasons: inappropriate input arguments, under-dispersed x and y data, GMCM non-convergency.
-        
+    if sens_indx>1:
+        sens_indx = 1
+        print('Warning: In theory, sensitivity larger than one is impossible. However, in practice this can happen.')
+        print('e.g., when the %s-order variance is overestimated due to insuffcient input-output data.'%(sensType))
+    
     print('    Sensitivity index = %.6f'%(sens_indx))
     
     return sens_indx, gmcm
@@ -175,7 +179,7 @@ def gmcm_inference(x_norm, y_norm, n_components='optimal'):
     n_xvariables = np.shape(x_norm)[1]
 
     if isinstance(n_components, str) and n_components=='optimal':
-        n_components = np.arange(2, 10) # Multiple candidate GMCMs. Hard coded to limit the number of parameters. 
+        n_components = np.arange(1, 10) # Multiple candidate GMCMs. Hard coded to limit the number of parameters. 
     elif isinstance(n_components, int) and n_components>0:
         n_components = [n_components]
     else:
