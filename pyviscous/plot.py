@@ -11,7 +11,6 @@ import sys
 sys.path.append('./')
 import pyviscous as vs
 
-
 def plot_rosenbrock_3d(ofile):
     """ 
     Plot the example Rosenbrock function in 3D.    
@@ -103,16 +102,16 @@ def plot_data_conversion(x,y,xIndex,ofile):
     for i in range(ndata):
         if i == 0:
             data_x,data_y = x[:,xIndex],y
-            xlabel,ylabel = '${X_%d}$'%(xIndex+1),'$Y$'
-            title = '(a) Input-output data $(x_%d, y)$'%(xIndex+1) 
+            xlabel,ylabel = '${X_{%d}}$'%(xIndex+1),'$Y$'
+            title = '(a) Input-output data $(x_{%d}, y)$'%(xIndex+1) 
         elif i == 1:
             data_x,data_y = x_norm[:,xIndex],y_norm
-            xlabel,ylabel = "${X'_%d}$"%(xIndex),"$Y'$"  
-            title = "(b) Normalized data $(x'_%d, y')$"%(xIndex+1)  
+            xlabel,ylabel = "${X'_{%d}}$"%(xIndex+1),"$Y'$"  
+            title = "(b) Normalized data $(x'_{%d}, y')$"%(xIndex+1)  
         elif i == 2:
             data_x,data_y = ux[:,xIndex],uy
-            xlabel,ylabel = '${U_{X_%d}}$'%(xIndex+1),'${U_{Y}}$'
-            title = '(c) Marginal CDF data $(u_{x_1}, u_y)$'
+            xlabel,ylabel = '${U_{X_{%d}}}$'%(xIndex+1),'${U_{Y}}$'
+            title = '(c) Marginal CDF data $(u_{x_{%d}}, u_y)$'%(xIndex+1) 
 
         # Create the Axes.  
         ax = fig.add_subplot(spec[1, i*2])
@@ -127,7 +126,7 @@ def plot_data_conversion(x,y,xIndex,ofile):
         # labels
         ax_histx.set_axis_off()
         ax_histy.set_axis_off() 
-        ax.spines[['right', 'top']].set_visible(False) # Hide the right and top spines
+        ax.spines[['right', 'top']].set_visible(True) # Hide the right and top spines
 
         # title
         ax_histx.set_title(title, fontsize='medium')
@@ -241,7 +240,7 @@ def plot_gmm_pdf_cluster(gmm, x, y, xIndex, ofile):
     plt.setp(ax, ylim=ax[0].get_ylim())
 
     plt.tight_layout()
-    plt.savefig(ofile, dpi=150)
+    plt.savefig(ofile, dpi=100)
     plt.show()    
     plt.close(fig)  
     return
@@ -374,7 +373,7 @@ def plot_gmm_counter(gmm, x, y, xIndex, ofile):
                     axes[irow,icol].axis('off')
 
     plt.tight_layout()
-    plt.savefig(ofile, dpi=150)
+    plt.savefig(ofile, dpi=100)
     plt.show() 
     plt.close(fig)  
     return
@@ -464,7 +463,7 @@ def plot_gmm_marginal_dists(gmm, x, y, xIndex, ofile):
         ax[icol].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25), fancybox=False, shadow=False, ncol=1,fontsize='small')
 
     plt.tight_layout()
-    plt.savefig(ofile, dpi=150)
+    plt.savefig(ofile, dpi=100)
     plt.show()
     plt.close(fig)  
     return
@@ -556,7 +555,7 @@ def plot_gmm_mean_cov(gmm, sensType, xIndex, ofile):
             cbar.ax.set_title('Covariance',fontsize=fs,style='italic')
             cbar.ax.tick_params(labelsize=fs)    
 
-    plt.savefig(ofile,dpi=150)
+    plt.savefig(ofile,dpi=100)
     plt.show()    
     plt.close(fig)  
     return
