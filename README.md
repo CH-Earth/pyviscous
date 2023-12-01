@@ -30,16 +30,7 @@ import sys
 sys.path.insert(path_to_directory)
 import pyviscous
 ```
-Replace *path_to_directory* with the absolute path to the folder where the pyviscous repository is located on your computer. Before utilizing pyviscous in this manner, ensure that you have installed all the necessary Python packages as listed in the setup.py file. These packages include:
-- numpy
-- pandas
-- scipy
-- scikit-learn
-- copulae
-- matplotlib
-- jupyter
-
-Please specifically install the **copulae** package using **pip**, not **conda**. The conda distribution of **copulae** may lack its full source code/functions. We recommend using pip for a comprehensive installation. We will notify the copulae developer about this issue for resolution. 
+Replace *path_to_directory* with the absolute path to the folder where the pyviscous repository is located on your computer. **Note:** before utilizing pyviscous in this manner, ensure that you have installed all the necessary Python packages as listed in the setup.py file. These packages include **numpy**, **pandas**, **scipy**, **scikit-learn**, **copulae**, **matplotlib**, **jupyter**. Please specifically install the **copulae** package using **pip**, not **conda**. The conda distribution of **copulae** may lack its full source code/functions. We recommend using pip for a comprehensive installation. We will notify the copulae developer about this issue for resolution. 
 
 ### Examples
 We provide five demonstration notebooks in the example directory, including the Rosenbrock function and four Sobol’ functions from Liu et al. (2023). Additionally, a real case study of the **Bow at Banff basin, Alberta, Canada**, is included to show the real-world application of VISCOUS. Each example includes scripts for input-output data generation or reading, VISCOUS setup and execution, and evaluation of sensitivity results.
