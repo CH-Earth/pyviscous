@@ -30,13 +30,15 @@ import sys
 sys.path.insert(path_to_directory)
 import pyviscous
 ```
-Replace *path_to_directory* with the absolute path to the folder where the pyviscous repository is located on your computer. **Note:** before utilizing pyviscous in this manner, ensure that you have installed all the necessary Python packages as listed in the setup.py file. These packages include **numpy**, **pandas**, **scipy**, **scikit-learn**, **copulae**, **matplotlib**, **jupyter**. Please specifically install the **copulae** package using **pip**, not **conda**. The conda distribution of **copulae** may lack its full source code/functions. We recommend using pip for a comprehensive installation. We will notify the copulae developer about this issue for resolution. 
+Replace *path_to_directory* with the absolute path to the folder where the pyviscous repository is located on your computer. **Note:** before utilizing pyviscous in this manner, ensure that you have installed all the necessary Python packages as listed in the setup.py file. These packages include **numpy**, **pandas**, **scipy**, **scikit-learn**, **copulae**, **matplotlib**, **jupyter**. 
+
+**NOTE**: Please install the **copulae** package using **pip**, not **conda**. The conda distribution of **copulae** lacks its full source code/functions. We recommend using pip for a comprehensive installation. We will notify the copulae developer about this issue for resolution. 
 
 ### Examples
 We provide five demonstration notebooks in the example directory, including the Rosenbrock function and four Sobol’ functions from Liu et al. (2024). Additionally, a real case study of the **Bow at Banff basin, Alberta, Canada**, is included to show the real-world application of VISCOUS. Each example includes scripts for input-output data generation or reading, VISCOUS setup and execution, and evaluation of sensitivity results.
 
 ### Credits
-VISCOUS was originally developed by Sheikholeslami et al. (2021) and further enhanced by Liu et al. (2023). When using pyVISCOUS, please kindly acknowledge the contributions of the latter publication.
+VISCOUS was originally developed by Sheikholeslami et al. (2021) and enhanced by Liu et al. (2023). 
 - Sheikholeslami, R., Gharari, S., Papalexiou, S. M., & Clark, M. P. (2021) VISCOUS: A variance-based sensitivity analysis using copulas for efficient identification of dominant hydrological processes. *Water Resources Research*, 57, e2020WR028435. https://doi.org/10.1029/2020WR028435
 - Liu, H., Clark, M. P., Gharari, S., Sheikholeslami, R., Freer, J., Knoben, W. J. M., Marsh C. B., & Papalexiou, S. M. (2024) An improved copula-based framework for efficient global sensitivity analysis. *Water Resources Research*, 60, e2022WR033808. https://doi.org/10.1029/2022WR033808
 
