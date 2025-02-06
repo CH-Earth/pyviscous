@@ -9,7 +9,15 @@ except:
 
 from setuptools import find_packages
 
-requirements = ['numpy', 'pandas', 'scipy', 'scikit-learn', 'copulae', 'matplotlib', 'jupyter']
+requirements = [
+    'numpy==1.26.4',
+    'pandas==2.2.2',
+    'scipy==1.13.1',
+    'scikit-learn',  # No specific version specified
+    'copulae==0.7.9',
+    'matplotlib',    # No specific version specified
+    'jupyter'        # No specific version specified
+]
 # Important note: if users install the above required packages by themselves, please install copulae via pip, not conda. 
 # This is because the conda distribution of copulae does not properly include its full source code/functions. 
 # We will remind the developer of copulae to fix this.
@@ -55,5 +63,3 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
 )
-
-
