@@ -38,7 +38,7 @@ pip install copulae
 **Installation notes for Approach 3**  <br>
 **(1) Why `wheel>=0.36` is needed?** <br>
 - When the `wheel` package is not installed, `pip` falls back to the legacy `setup.py install` method to install `copulae` where dependencies like `numpy` are required at the build time.
-- Since `copulae` uses a `pyproject.toml`-based build system, `pip` builds it in an isolated environment to prevent interference from your existing environment. This means it cannot access pre-installed packages like `numpy`, leading to the error.
+- Since `copulae` uses a `pyproject.toml`-based build system, `pip` builds it in an isolated environment to prevent interference from your existing environment. This means it cannot access pre-installed packages like `numpy`, leading to the error _ModuleNotFoundError: No module named 'numpy'_.
 - Installing `wheel>=0.36` enables pip to use the modern PEP 517/518 build process, which correctly handles build-time dependencies like `numpy` inside the isolated environment.<br>
 
 **(2) Install `copulae` using `pip`, not `conda`.** <br>
