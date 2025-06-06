@@ -15,8 +15,8 @@ git clone https://github.com/<your_username>/pyviscous.git
 # Navigate into the cloned directory
 cd pyviscous
 
-# Install
-python setup.py install
+# Install pyviscous using pyproject.toml-based build system
+pip install .
 ```
 **Note**: This assumes you have forked the repository from GitHub manually.
 
