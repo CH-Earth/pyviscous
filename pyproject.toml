@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61", "wheel", "packaging>=24.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyviscous"
+version = "2.2.2"
+description = "Python codes to implement the VISCOUS global sensitivity analysis framework"
+readme = "README.md"
+requires-python = ">=3.6"
+license = "GPL-3.0-only"
+authors = [
+  { name="Hongli Liu", email="hongliliu68@gmail.com" }
+]
+dependencies = [
+  "wheel>=0.36",
+  "copulae"
+]
+
+[project.urls]
+Homepage = "https://github.com/CH-Earth/pyviscous"
